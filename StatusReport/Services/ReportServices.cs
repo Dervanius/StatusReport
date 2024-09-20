@@ -70,47 +70,82 @@ namespace StatusReport.Services
         {
             using (var connection = _serverConnection.GetDbConnection())
             {
-                string sql = @"
-        WITH RankedEvents AS (
-            SELECT
-                s.ExternalNumber,
-                s.Id,
-                m.awb,
-                s.Barcodes,
-                clu.Description as Status,
-                se.EventDate,
-                ROW_NUMBER() OVER (PARTITION BY s.ShipmentId ORDER BY se.EventDate desc) AS RowNum,
-                clu.DisplayOrder,
-                s.Weight
-            FROM
-                ShipmentEvent se
-            INNER JOIN
-                Shipment s ON s.Id = se.ShipmentId
-            INNER JOIN
-                Manifest m ON m.Id = s.ManifestId
-            INNER JOIN
-                CodeLookUp clu ON clu.Id = se.StatusCodeId
-            INNER JOIN
-                (SELECT [value] FROM OPENJSON(@JsonList)) as jsons ON jsons.[value] = s.ExternalNumber
-            WHERE
-                se.StatusCodeId = 1244 -- Ocarinjeno status
-        )
-        SELECT
-            Barcodes,
-            ExternalNumber,
-            Status,
-            EventDate,
-            Weight,
-            awb
-        FROM
-            RankedEvents
-        WHERE
-            RowNum = 1
-        ORDER BY
-            Barcodes;";
+                //string sql = @"
+                //            WITH RankedEvents AS (
+                //            SELECT
+                //                s.ExternalNumber,
+                //                s.Id,
+                //                m.awb,
+                //                s.Barcodes,
+                //                clu.Description as Status,
+                //                se.EventDate,
+                //                ROW_NUMBER() OVER (PARTITION BY s.ShipmentId ORDER BY se.EventDate desc) AS RowNum,
+                //                clu.DisplayOrder,
+                //                s.Weight
+                //            FROM
+                //                ShipmentEvent se
+                //            INNER JOIN
+                //                Shipment s ON s.Id = se.ShipmentId
+                //            INNER JOIN
+                //                Manifest m ON m.Id = s.ManifestId
+                //            INNER JOIN
+                //                CodeLookUp clu ON clu.Id = se.StatusCodeId
+                //            INNER JOIN
+                //                (SELECT [value] FROM OPENJSON(@JsonList)) as jsons ON jsons.[value] = s.ExternalNumber
+                //            WHERE
+                //                se.StatusCodeId = 1244 -- Ocarinjeno status
+                //        )
+                //        SELECT
+                //            Barcodes,
+                //            ExternalNumber,
+                //            Status,
+                //            EventDate,
+                //            Weight,
+                //            awb
+                //        FROM
+                //            RankedEvents
+                //        WHERE
+                //            RowNum = 1
+                //        ORDER BY
+                //            Barcodes;";
+
+                string sql = @"WITH RankedEvents AS (
+                                SELECT
+		                            s.ExternalNumber
+		                            ,s.Id
+		                            ,m.awb
+                                    ,s.Barcodes
+		                            ,clu.Description as status
+		                            ,EventDate
+                                    ,ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate desc) AS RowNum
+		                            ,clu.DisplayOrder
+		                            ,s.Weight
+                                FROM
+                                    ShipmentEvent se
+
+	                            inner join Shipment s on s.id = se.ShipmentId
+	                            inner join Manifest m on m.id = s.manifestid
+	                            inner join CodeLookUp clu on clu.id = se.StatusCodeId
+	                            INNER JOIN (SELECT [value] FROM OPENJSON(@JsonList)) as jsons  ON jsons.[value] = s.ExternalNumber
+	                            where se.StatusCodeId = 1244
+                            )
+
+                            SELECT
+	                            Barcodes
+	                            ,ExternalNumber
+	                            ,Status
+	                            ,EventDate
+	                            ,weight
+	                            ,awb
+	                            FROM
+                                RankedEvents
+                            WHERE
+                                RowNum = 1
+	                            Order by Barcodes";
 
                 var parameters = new { JsonList = jsonList };
-                return await connection.QueryAsync(sql, parameters);
+                var result = await connection.QueryAsync(sql, parameters);
+                return result.ToList();
             }
         }
 
