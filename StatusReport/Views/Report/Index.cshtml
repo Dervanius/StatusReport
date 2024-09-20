@@ -1,0 +1,84 @@
+﻿@using StatusReport.ViewModels
+@model FileUploadViewModel
+<div class="container">
+    <h1>Report Generator</h1>
+    <form asp-action="UploadExcelFile" method="post" enctype="multipart/form-data">
+        <div class="bg-dark p-4">
+            <div class="row">
+                <div class="col-3">
+                    <p>Generate by:</p>
+                </div>
+                <div class="col-9"></div>
+            </div>
+            <div class="row">
+                <div class="col-2">
+                    <label class="radio-inline">
+                        <input type="radio" name="optradio" value="barcode" checked><span class="ms-3">Barcode</span>
+                    </label>
+                </div>
+                <div class="col-2">
+                    <label class="radio-inline">
+                        <input type="radio" name="optradio" value="external"><span class="ms-3">External Number</span>
+                    </label>
+                </div>
+                <div class="col-8"></div>
+            </div>
+            <hr />
+            <!-- Drag and Drop Area -->
+            <div class="mt-5">
+                <div id="drop-zone" class="bg-light border p-5 text-center" style="border-radius: 8px;">
+                    <p>Drag & Drop your Excel file here or click to upload</p>
+                    <input type="file" id="file-input" name="excelFile" style="display:none;" />
+                    <p id="file-name" class="mt-2 text-success"></p> <!-- File name display -->
+                </div>
+            </div>
+
+            <!-- Validation Message -->
+            <div class="mt-3 text-danger">
+                @if (ViewData["ErrorMessage"] != null)
+                {
+                    <p>@ViewData["ErrorMessage"]</p>
+                }
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-4">Submit</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileNameDisplay = document.getElementById('file-name');
+
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        dropZone.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            dropZone.classList.add('dragging');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragging');
+        });
+
+        dropZone.addEventListener('drop', (event) => {
+            event.preventDefault();
+            dropZone.classList.remove('dragging');
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                fileNameDisplay.textContent = files[0].name; // Display the file name
+            }
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                fileNameDisplay.textContent = fileInput.files[0].name; // Display the file name on selection
+            }
+        });
+    </script>
+}
