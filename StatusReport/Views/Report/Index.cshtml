@@ -1,10 +1,112 @@
 ﻿@using StatusReport.ViewModels
 @model FileUploadViewModel
 <div class="container">
-    <h1 class="mb-4">Report Generator</h1>
+    <h1 class="mb-3 mt-3">Report Generator</h1>
     <form asp-action="UploadExcelFile" method="post" enctype="multipart/form-data" class="">
-        <div class="bg-dark p-4">
+        <div class="bg-dark p-4" style="border-radius:20px;">
             <div class="row">
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Generate by:</h5>
+                            <div class="row">
+                                <label class="radio-inline card-text ">
+                                    <input type="radio" name="criteria" value="barcode" checked><span class="ms-3">Barcode</span>
+                                </label>
+                            </div>                          
+                            <div class="row">
+                                <label class="radio-inline card-text">
+                                    <input type="radio" name="criteria" value="external"><span class="ms-3">External Number</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Status:</h5>
+                            <div class="row">
+                                <label class="radio-inline card-text ">
+                                    <input type="radio" name="status" value="last" checked><span class="ms-3">Last</span>
+                                </label>
+                            </div>
+                            <div class="row">
+                                <label class="radio-inline card-text">
+                                    <input type="radio" name="status" value="cleared"><span class="ms-3">Cleared</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            
+            
+            
+            
+            
+            
+            
+            @* <div class="row">
+                <div class="col-lg-6">
+                    <div class="row mt-3">
+                        <p> <strong>Generate by:</strong></p>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="radio-inline">
+                                <input type="radio" name="criteria" value="barcode" checked><span class="ms-3">Barcode</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="radio-inline">
+                                <input type="radio" name="criteria" value="external"><span class="ms-3">External Number</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <hr />
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-lg-6">
+                    <div class="row mt-3">
+                        <p> <strong>Status:</strong></p>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="radio-inline">
+                                <input type="radio" name="status" value="last" checked><span class="ms-3">Last</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="radio-inline">
+                                <input type="radio" name="status" value="cleared"><span class="ms-3">Cleared</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <hr />
+                        </div>
+                    </div>
+                </div>
+            </div> *@
+
+
+
+
+
+
+@*             <div class="row">
                 <div class="col-6">
                     <p>Generate by:</p>
                 </div>
@@ -36,7 +138,7 @@
                     </label>
                 </div>
                 <div class="col-2"></div>
-            </div>
+            </div> *@
             <hr />
             <!-- Drag and Drop Area -->
             <div class="mt-5">
@@ -55,7 +157,7 @@
                 }
             </div>
 
-            <button type="submit" class="btn btn-primary mt-4">Submit</button>
+            <button type="submit" class="btn btn-primary mt-4">Generate</button>
         </div>
     </form>
 </div>
