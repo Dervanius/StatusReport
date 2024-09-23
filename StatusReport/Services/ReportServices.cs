@@ -14,147 +14,111 @@ namespace StatusReport.Services
             _serverConnection = new ServerConnection();
         }
 
-        public async Task<IEnumerable<dynamic>> GetReportByBarcodesAsync(string jsonList)
+              
+        //GetClearedReport
+        public async Task<IEnumerable<dynamic>> GetClearedReport(string jsonList, bool isSearchByBarcode)
         {
             using (var connection = _serverConnection.GetDbConnection())
             {
-                string sql = @"
-        WITH LatestEvents AS (
-            SELECT
-                s.Barcodes,
-                e.StatusCodeId,
-                l.Description,
-                e.Id AS EventId,
-                e.EventDate
-            FROM
-                ShipmentEvent e
-            INNER JOIN
-                Shipment s ON e.ShipmentId = s.Id
-            INNER JOIN
-                CodeLookUp l ON e.StatusCodeId = l.Id
-            INNER JOIN
-                (SELECT JSON_VALUE([value], '$.Barcodes') AS Barcodes
-                 FROM OPENJSON(@JsonList)) AS jsons
-                ON jsons.Barcodes = s.Barcodes
-        ),
-        RankedEvents AS (
-            SELECT
-                Barcodes,
-                StatusCodeId,
-                Description,
-                EventId,
-                EventDate,
-                ROW_NUMBER() OVER (PARTITION BY Barcodes ORDER BY EventId DESC) AS rn
-            FROM
-                LatestEvents
-        )
-        SELECT
-            Barcodes,
-            EventId,
-            EventDate,
-            StatusCodeId,
-            Description
-        FROM
-            RankedEvents
-        WHERE
-            rn = 1
-        ORDER BY
-            Barcodes;";
+
+                string sql = @"WITH RankedEvents AS (
+                            SELECT
+		                    s.ExternalNumber,
+		                    s.Id,
+		                    m.awb,
+		                    m.Nalog,
+                            s.Barcodes,
+		                    clu.Description as status,
+		                    EventDate,
+                            ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate desc) AS RowNum,
+		                    clu.DisplayOrder,
+		                    s.Weight
+                            FROM ShipmentEvent se
+	                        INNER JOIN Shipment s on s.id = se.ShipmentId
+	                        INNER JOIN Manifest m on m.id = s.manifestid
+	                        INNER JOIN CodeLookUp clu on clu.id = se.StatusCodeId ";
+
+                if (isSearchByBarcode)
+                {
+                    sql += @" INNER JOIN (SELECT [value] FROM OPENJSON(@JsonList)) as jsons ON jsons.[value] = s.Barcodes";
+                }
+                else 
+                {
+                    sql += @" INNER JOIN (SELECT [value] FROM OPENJSON(@JsonList)) as jsons ON jsons.[value] = s.ExternalNumber ";
+                }
+
+                sql += @" WHERE se.StatusCodeId = 1244 ) 
+                            SELECT 
+                            AWB, 
+                            Nalog, 
+                            Barcodes, 
+                            ExternalNumber, 
+                            Status, 
+                            EventDate, 
+                            Weight 
+                            FROM RankedEvents
+                            WHERE
+                            RowNum = 1
+	                        ORDER BY Barcodes";
 
                 var parameters = new { JsonList = jsonList };
-                return await connection.QueryAsync(sql, parameters);
+                var result = await connection.QueryAsync(sql, parameters);
+                return result.ToList();
             }
+
         }
 
-        public async Task<IEnumerable<dynamic>> GetReportByExternalNumbersAsync(string jsonList)
+        //GetLastReport
+        public async Task<IEnumerable<dynamic>> GetLastReport(string jsonList, bool isSearchByBarcode)
         {
             using (var connection = _serverConnection.GetDbConnection())
             {
-                //string sql = @"
-                //            WITH RankedEvents AS (
-                //            SELECT
-                //                s.ExternalNumber,
-                //                s.Id,
-                //                m.awb,
-                //                s.Barcodes,
-                //                clu.Description as Status,
-                //                se.EventDate,
-                //                ROW_NUMBER() OVER (PARTITION BY s.ShipmentId ORDER BY se.EventDate desc) AS RowNum,
-                //                clu.DisplayOrder,
-                //                s.Weight
-                //            FROM
-                //                ShipmentEvent se
-                //            INNER JOIN
-                //                Shipment s ON s.Id = se.ShipmentId
-                //            INNER JOIN
-                //                Manifest m ON m.Id = s.ManifestId
-                //            INNER JOIN
-                //                CodeLookUp clu ON clu.Id = se.StatusCodeId
-                //            INNER JOIN
-                //                (SELECT [value] FROM OPENJSON(@JsonList)) as jsons ON jsons.[value] = s.ExternalNumber
-                //            WHERE
-                //                se.StatusCodeId = 1244 -- Ocarinjeno status
-                //        )
-                //        SELECT
-                //            Barcodes,
-                //            ExternalNumber,
-                //            Status,
-                //            EventDate,
-                //            Weight,
-                //            awb
-                //        FROM
-                //            RankedEvents
-                //        WHERE
-                //            RowNum = 1
-                //        ORDER BY
-                //            Barcodes;";
 
                 string sql = @"WITH RankedEvents AS (
                                 SELECT
-		                            s.ExternalNumber
-		                            ,s.Id
-		                            ,m.awb
-                                    ,s.Barcodes
-		                            ,clu.Description as status
-		                            ,EventDate
-                                    ,ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate desc) AS RowNum
-		                            ,clu.DisplayOrder
-		                            ,s.Weight
-                                FROM
-                                    ShipmentEvent se
+		                        m.AWB,
+		                        m.Nalog,
+                                Barcodes,
+		                        s.ExternalNumber,
+		                        clu.Description as status
+		                        ,EventDate,
+		                        s.Weight,
+                                ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate desc) AS RowNum,
+		                        clu.DisplayOrder
+                                FROM ShipmentEvent se
+	                            INNER JOIN Shipment s on s.id = se.ShipmentId
+	                            INNER JOIN CodeLookUp clu on clu.id = s.StatusCodeId";
 
-	                            inner join Shipment s on s.id = se.ShipmentId
-	                            inner join Manifest m on m.id = s.manifestid
-	                            inner join CodeLookUp clu on clu.id = se.StatusCodeId
-	                            INNER JOIN (SELECT [value] FROM OPENJSON(@JsonList)) as jsons  ON jsons.[value] = s.ExternalNumber
-	                            where se.StatusCodeId = 1244
-                            )
+                if (isSearchByBarcode)
+                {
+                    sql += @" INNER JOIN (SELECT [value] FROM OPENJSON(@JsonList)) as jsons ON jsons.[value] = s.Barcodes ";
+                }
+                else 
+                {
+                    sql += @" INNER JOIN (SELECT [value] FROM OPENJSON(@JsonList)) as jsons ON jsons.[value] = s.ExternalNumber ";
+                }
 
-                            SELECT
-	                            Barcodes
-	                            ,ExternalNumber
-	                            ,Status
-	                            ,EventDate
-	                            ,weight
-	                            ,awb
-	                            FROM
-                                RankedEvents
-                            WHERE
-                                RowNum = 1
-	                            Order by Barcodes";
+                
+
+	            sql += @" INNER JOIN Manifest m on m.id = s.manifestid
+                        )
+                        SELECT
+	                    AWB,
+	                    Nalog,
+                        Barcodes,
+	                    ExternalNumber,
+	                    Status,
+	                    EventDate,
+	                    Weight
+                        FROM RankedEvents
+                        WHERE RowNum = 1
+                        ORDER BY EventDate ";
 
                 var parameters = new { JsonList = jsonList };
                 var result = await connection.QueryAsync(sql, parameters);
                 return result.ToList();
             }
         }
-
-
-
-
     }
-
-
-
-
 }
+
