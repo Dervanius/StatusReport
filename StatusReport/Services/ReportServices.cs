@@ -119,6 +119,44 @@ namespace StatusReport.Services
                 return result.ToList();
             }
         }
+
+        //Get Temp
+        public async Task<IEnumerable<dynamic>> GetTemporaryReport(string jsonList, bool isSearchByBarcode)
+        {
+            using (var connection = _serverConnection.GetDbConnection())
+            {
+
+                string sql = @"SELECT 
+                            m.AWB,
+                            m.Nalog,
+                            s.Barcodes,
+                            s.ExternalNumber,
+                            c.Description as Status, 
+                            s.CreatedOn as EventDate,
+                            s.Weight 
+                            FROM Shipment s
+                            INNER JOIN CodeLookUp c ON s.StatusCodeId = c.Id";
+                           
+                if (isSearchByBarcode)
+                {
+                    sql += @" INNER JOIN (SELECT [value] FROM OPENJSON(@JsonList)) as jsons ON jsons.[value] = s.Barcodes ";
+                }
+                else
+                {
+                    sql += @" INNER JOIN (SELECT [value] FROM OPENJSON(@JsonList)) as jsons ON jsons.[value] = s.ExternalNumber ";
+                }
+
+
+
+                sql += @" INNER JOIN Manifest m on m.id = s.manifestid";
+
+
+                var parameters = new { JsonList = jsonList };
+                var result = await connection.QueryAsync(sql, parameters, commandTimeout: 300);
+                return result.ToList();
+            }
+        }
+
     }
 }
 

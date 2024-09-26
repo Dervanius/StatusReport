@@ -48,7 +48,7 @@ namespace StatusReport.Controllers
                         return View("Index", model);
                     }
 
-                    // Read values from Column A (assuming barcodes are there)
+                    // Read values from Column A
                     for (int row = 1; row <= worksheet.Dimension.Rows; row++)
                     {
                         var barcode = worksheet.Cells[row, 1].Text;
@@ -66,7 +66,6 @@ namespace StatusReport.Controllers
 
                 var jsonList = JsonConvert.SerializeObject(barcodes);
 
-                //var reportResults = await _reportServices.GetClearedReportByBarcode(jsonList);
                 var reportResults = await _reportServices.GetClearedReport(jsonList, true);
 
                 return await GenerateExcelFile(reportResults);
@@ -76,11 +75,18 @@ namespace StatusReport.Controllers
 
                 var jsonList = JsonConvert.SerializeObject(barcodes);
 
-                //var reportResults = await _reportServices.GetClearedReportByExternalNumber(jsonList);
                 var reportResults = await _reportServices.GetClearedReport(jsonList, false);
 
                 return await GenerateExcelFile(reportResults);
 
+            }
+            else if (criteria == "barcode" && status == "last")
+            {
+                var jsonList = JsonConvert.SerializeObject(barcodes);
+
+                var reportResults = await _reportServices.GetLastReport(jsonList, true);
+
+                return await GenerateExcelFile(reportResults);
             }
             else if (criteria == "external" && status == "last")
             {
@@ -90,11 +96,19 @@ namespace StatusReport.Controllers
 
                 return await GenerateExcelFile(reportResults);
             }
+            else if (criteria == "barcode" && status == "temporary")
+            {
+                var jsonList = JsonConvert.SerializeObject(barcodes);
+
+                var reportResults = await _reportServices.GetTemporaryReport(jsonList, true);
+
+                return await GenerateExcelFile(reportResults);
+            }
             else 
             {
                 var jsonList = JsonConvert.SerializeObject(barcodes);
 
-                var reportResults = await _reportServices.GetLastReport(jsonList, true);
+                var reportResults = await _reportServices.GetTemporaryReport(jsonList, false);
 
                 return await GenerateExcelFile(reportResults);
             }
