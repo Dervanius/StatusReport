@@ -62,7 +62,7 @@ namespace StatusReport.Services
 	                        ORDER BY Barcodes";
 
                 var parameters = new { JsonList = jsonList };
-                var result = await connection.QueryAsync(sql, parameters);
+                var result = await connection.QueryAsync(sql, parameters, commandTimeout:300);
                 return result.ToList();
             }
 
@@ -115,7 +115,7 @@ namespace StatusReport.Services
                         ORDER BY EventDate ";
 
                 var parameters = new { JsonList = jsonList };
-                var result = await connection.QueryAsync(sql, parameters);
+                var result = await connection.QueryAsync(sql, parameters, commandTimeout: 300);
                 return result.ToList();
             }
         }
