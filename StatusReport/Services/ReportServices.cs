@@ -70,8 +70,9 @@ namespace StatusReport.Services
         }
 
         //GetLastReport
-        public async Task<IEnumerable<dynamic>> GetLastReport(string jsonList, bool isSearchByBarcode)
+        public async Task<IEnumerable<dynamic>> GetTemporaryReport(string jsonList, bool isSearchByBarcode)
         {
+            throw new NotImplementedException();
             using (var connection = _serverConnection.GetDbConnection())
             {
 
@@ -123,7 +124,7 @@ namespace StatusReport.Services
         }
 
         //Get Temp
-        public async Task<IEnumerable<dynamic>> GetTemporaryReport(string jsonList, bool isSearchByBarcode)
+        public async Task<IEnumerable<dynamic>> GetLastReport(string jsonList, bool isSearchByBarcode)
         {
             using (var connection = _serverConnection.GetDbConnection())
             {
