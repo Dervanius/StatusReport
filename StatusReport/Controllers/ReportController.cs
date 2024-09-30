@@ -127,7 +127,8 @@ namespace StatusReport.Controllers
                 worksheet.Cells[1, 4].Value = "External Number";
                 worksheet.Cells[1, 5].Value = "Status";
                 worksheet.Cells[1, 6].Value = "Event Date";
-                worksheet.Cells[1, 7].Value = "Weight";
+                worksheet.Cells[1, 7].Value = "Created On";
+                worksheet.Cells[1, 8].Value = "Weight";
 
                 // Adding data rows
                 int row = 2;
@@ -139,8 +140,10 @@ namespace StatusReport.Controllers
                     worksheet.Cells[row, 4].Value = result.ExternalNumber;
                     worksheet.Cells[row, 5].Value = result.Status;
                     worksheet.Cells[row, 6].Value = result.EventDate;
-                    worksheet.Cells[row, 6].Style.Numberformat.Format = "yyyy-mm-dd hh-mm-ss";
-                    worksheet.Cells[row, 7].Value = result.Weight;
+                    worksheet.Cells[row, 6].Style.Numberformat.Format = "yyyy.mm.dd hh:mm:ss";
+                    worksheet.Cells[row, 7].Value = result.CreatedOn;
+                    worksheet.Cells[row, 7].Style.Numberformat.Format = "yyyy.mm.dd hh:mm:ss";
+                    worksheet.Cells[row, 8].Value = result.Weight;
                     row++;
                 }
 

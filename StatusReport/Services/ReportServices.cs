@@ -23,19 +23,20 @@ namespace StatusReport.Services
 
                 string sql = @"WITH RankedEvents AS (
                             SELECT
-		                    s.ExternalNumber,
-		                    s.Id,
-		                    m.awb,
-		                    m.Nalog,
-                            s.Barcodes,
-		                    clu.Description as status,
-		                    EventDate,
-                            ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate desc) AS RowNum,
-		                    clu.DisplayOrder,
-		                    s.Weight
+		                        s.ExternalNumber,
+		                        s.Id,
+		                        m.awb,
+		                        m.Nalog,
+                                s.Barcodes,
+		                        clu.Description as status
+		                        se.EventDate,
+                                s.CreatedOn,
+                                ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate desc) AS RowNum,
+		                        clu.DisplayOrder,
+		                        s.Weight
                             FROM ShipmentEvent se
 	                        INNER JOIN Shipment s on s.id = se.ShipmentId
-	                        INNER JOIN Manifest m on m.id = s.manifestid
+	                        LEFT JOIN Manifest m on m.id = s.manifestid
 	                        INNER JOIN CodeLookUp clu on clu.id = se.StatusCodeId ";
 
                 if (isSearchByBarcode)
@@ -76,18 +77,19 @@ namespace StatusReport.Services
 
                 string sql = @"WITH RankedEvents AS (
                                 SELECT
-		                        m.AWB,
-		                        m.Nalog,
-                                Barcodes,
-		                        s.ExternalNumber,
-		                        clu.Description as status
-		                        ,EventDate,
-		                        s.Weight,
-                                ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate desc) AS RowNum,
-		                        clu.DisplayOrder
+		                            m.AWB,
+		                            m.Nalog,
+                                    Barcodes,
+		                            s.ExternalNumber,
+		                            clu.Description as status,
+		                            se.EventDate,
+                                    s.CreatedOn,
+		                            s.Weight,
+                                    ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate desc) AS RowNum,
+		                            clu.DisplayOrder
                                 FROM ShipmentEvent se
 	                            INNER JOIN Shipment s on s.id = se.ShipmentId
-	                            INNER JOIN CodeLookUp clu on clu.id = s.StatusCodeId";
+	                            INNER JOIN CodeLookUp clu on clu.id = se.StatusCodeId";
 
                 if (isSearchByBarcode)
                 {
@@ -100,7 +102,7 @@ namespace StatusReport.Services
 
                 
 
-	            sql += @" INNER JOIN Manifest m on m.id = s.manifestid
+	            sql += @" LEFT JOIN Manifest m on m.id = s.manifestid
                         )
                         SELECT
 	                    AWB,
@@ -132,7 +134,8 @@ namespace StatusReport.Services
                             s.Barcodes,
                             s.ExternalNumber,
                             c.Description as Status, 
-                            s.CreatedOn as EventDate,
+                            s.StatusTime as EventDate,
+                            s.CreatedOn as CreatedOn,
                             s.Weight 
                             FROM Shipment s
                             INNER JOIN CodeLookUp c ON s.StatusCodeId = c.Id";
@@ -148,7 +151,7 @@ namespace StatusReport.Services
 
 
 
-                sql += @" INNER JOIN Manifest m on m.id = s.manifestid";
+                sql += @" LEFT JOIN Manifest m on m.id = s.manifestid";
 
 
                 var parameters = new { JsonList = jsonList };
