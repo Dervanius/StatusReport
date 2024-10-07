@@ -27,6 +27,7 @@ namespace StatusReport.Services
 		                        s.Id,
 		                        m.awb,
 		                        m.Nalog,
+                                s.LastMileCarrier,
                                 s.Barcodes,
 		                        clu.Description as status
 		                        se.EventDate,
@@ -132,6 +133,7 @@ namespace StatusReport.Services
                 string sql = @"SELECT 
                             m.AWB,
                             m.Nalog,
+                            s.LastMileCarrier,
                             s.Barcodes,
                             s.ExternalNumber,
                             c.Description as Status, 
