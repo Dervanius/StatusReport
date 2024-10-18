@@ -1,22 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using StatusReport.ViewModels;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.IO;
-using System.Threading.Tasks;
 using StatusReport.Services;
 using Newtonsoft.Json;
+using StatusReport.Models.Dto;
+using StatusReport.Actions;
 
 namespace StatusReport.Controllers
 {
     public class ReportController : Controller
     {
         private readonly ReportServices _reportServices;
+        private readonly BarcodeServices _barcodeServices;
+
 
         public ReportController()
         {
             _reportServices = new ReportServices();
+            _barcodeServices = new BarcodeServices();
         }
 
         [HttpPost]
@@ -104,6 +105,16 @@ namespace StatusReport.Controllers
 
                 return await GenerateExcelFile(reportResults);
             }
+            else if (criteria == "barcode" && status == "barcode")
+            {
+                var reportResults = await _barcodeServices.GetCourierBarcode(barcodes, true);
+                return await GenerateCourierBarcodeExcel(reportResults);
+            }
+            else if (criteria == "external" && status == "barcode")
+            {
+                var reportResults = await _barcodeServices.GetCourierBarcode(barcodes, false);
+                return await GenerateCourierBarcodeExcel(reportResults);
+            }
             else 
             {
                 var jsonList = JsonConvert.SerializeObject(barcodes);
@@ -160,7 +171,16 @@ namespace StatusReport.Controllers
                 return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }
         }
- 
+
+        private async Task<IActionResult> GenerateCourierBarcodeExcel(List<CourierBarcodeDto> listCourierBarcodeDto)
+        {
+            var excel = await ExcelGenerator.CreateExcel(listCourierBarcodeDto, typeof(CourierBarcodeDto).GetProperties(), $"Barcodes_{DateTime.Now.ToString("yyMMddHHmmss")}");
+            if (excel == null)
+                return null;
+
+            return excel;
+        }
+
         public IActionResult Index()
         {
             return View();
