@@ -154,11 +154,11 @@ namespace StatusReport.Controllers
                     worksheet.Cells[row, 4].Value = result.Barcodes;
                     worksheet.Cells[row, 5].Value = result.ExternalNumber;
                     worksheet.Cells[row, 6].Value = result.Status;
-                    worksheet.Cells[row, 7].Value = result.EventDate.Date;
+                    worksheet.Cells[row, 7].Value = result.EventDateOnly;
                     worksheet.Cells[row, 7].Style.Numberformat.Format = "yyyy.mm.dd";
                     worksheet.Cells[row, 8].Value = result.EventDate;
                     worksheet.Cells[row, 8].Style.Numberformat.Format = "hh:mm:ss";
-                    worksheet.Cells[row, 9].Value = result.CreatedOn.Date;
+                    worksheet.Cells[row, 9].Value = result.CreatedOnDateOnly;
                     worksheet.Cells[row, 9].Style.Numberformat.Format = "yyyy.mm.dd";
                     worksheet.Cells[row, 10].Value = result.CreatedOn;
                     worksheet.Cells[row, 10].Style.Numberformat.Format = "hh:mm:ss";

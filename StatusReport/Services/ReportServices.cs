@@ -138,7 +138,9 @@ namespace StatusReport.Services
                             s.ExternalNumber,
                             c.Description as Status, 
                             s.StatusTime as EventDate,
+                            CAST(s.StatusTime AS DATE) as EventDateOnly,
                             s.CreatedOn as CreatedOn,
+                            CAST(s.CreatedOn AS DATE) as CreatedOnDateOnly,
                             s.Weight 
                             FROM Shipment s
                             INNER JOIN CodeLookUp c ON s.StatusCodeId = c.Id";
