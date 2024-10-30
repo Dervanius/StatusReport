@@ -38,7 +38,7 @@ namespace StatusReport.Services
                 if (isSearchByBarcode)
                     sql += " INNER JOIN (SELECT [value] FROM OPENJSON(@json)) as jsons  ON jsons.[value] = s.Barcodes";
                 else
-                    sql += " INNER JOIN (SELECT [value] FROM OPENJSON(@json)) as jsons  ON jsons.[value] = s.ExternalNumber)";
+                    sql += " INNER JOIN (SELECT [value] FROM OPENJSON(@json)) as jsons  ON jsons.[value] = s.ExternalNumber";
 
                 var parameters = new { json };
                 var result = (await connection.QueryAsync<ShipmentCarrierDto>(sql, parameters, commandTimeout: 300)).ToList();

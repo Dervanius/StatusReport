@@ -29,16 +29,18 @@ namespace StatusReport.Services
 		                        m.Nalog,
                                 s.LastMileCarrier,
                                 s.Barcodes,
-		                        clu.Description as status
+		                        clu.Description as status,
 		                        se.EventDate,
+                                CAST(se.EventDate AS DATE) as EventDateOnly,
                                 s.CreatedOn,
+                                CAST(s.CreatedOn AS DATE) as CreatedOnDateOnly,
                                 ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate desc) AS RowNum,
 		                        clu.DisplayOrder,
 		                        s.Weight
                             FROM ShipmentEvent se
 	                        INNER JOIN Shipment s on s.id = se.ShipmentId
-	                        LEFT JOIN Manifest m on m.id = s.manifestid
-	                        INNER JOIN CodeLookUp clu on clu.id = se.StatusCodeId ";
+	                        INNER JOIN CodeLookUp clu on clu.id = se.StatusCodeId 
+                            INNER JOIN Manifest m on m.id = s.manifestid";
 
                 if (isSearchByBarcode)
                 {
@@ -49,19 +51,21 @@ namespace StatusReport.Services
                     sql += @" INNER JOIN (SELECT [value] FROM OPENJSON(@JsonList)) as jsons ON jsons.[value] = s.ExternalNumber ";
                 }
 
-                sql += @" WHERE se.StatusCodeId = 1244 ) 
-                            SELECT 
+                sql += @" WHERE se.StatusCodeId = 1244 
+                        ) SELECT
                             AWB, 
                             Nalog, 
+                            LastMileCarrier,
                             Barcodes, 
                             ExternalNumber, 
                             Status, 
                             EventDate, 
+                            EventDateOnly,
+                            CreatedOn,
+                            CreatedOnDateOnly,
                             Weight 
-                            FROM RankedEvents
-                            WHERE
-                            RowNum = 1
-	                        ORDER BY Barcodes";
+                        FROM RankedEvents
+                        WHERE RowNum = 1";
 
                 var parameters = new { JsonList = jsonList };
                 var result = await connection.QueryAsync(sql, parameters, commandTimeout:300);
@@ -70,28 +74,32 @@ namespace StatusReport.Services
 
         }
 
-        //GetLastReport
+        //Get Temp
         public async Task<IEnumerable<dynamic>> GetTemporaryReport(string jsonList, bool isSearchByBarcode)
         {
-            throw new NotImplementedException();
             using (var connection = _serverConnection.GetDbConnection())
             {
 
                 string sql = @"WITH RankedEvents AS (
                                 SELECT
-		                            m.AWB,
-		                            m.Nalog,
-                                    Barcodes,
 		                            s.ExternalNumber,
+		                            s.Id,
+		                            m.awb,
+		                            m.Nalog,
+                                    s.LastMileCarrier,
+                                    s.Barcodes,
 		                            clu.Description as status,
 		                            se.EventDate,
+                                    CAST(se.EventDate AS DATE) as EventDateOnly,
                                     s.CreatedOn,
-		                            s.Weight,
+                                    CAST(s.CreatedOn AS DATE) as CreatedOnDateOnly,
                                     ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate desc) AS RowNum,
-		                            clu.DisplayOrder
+		                            clu.DisplayOrder,
+		                            s.Weight
                                 FROM ShipmentEvent se
 	                            INNER JOIN Shipment s on s.id = se.ShipmentId
-	                            INNER JOIN CodeLookUp clu on clu.id = se.StatusCodeId";
+	                            INNER JOIN CodeLookUp clu on clu.id = se.StatusCodeId
+                                INNER JOIN Manifest m on m.id = s.manifestid";
 
                 if (isSearchByBarcode)
                 {
@@ -102,21 +110,22 @@ namespace StatusReport.Services
                     sql += @" INNER JOIN (SELECT [value] FROM OPENJSON(@JsonList)) as jsons ON jsons.[value] = s.ExternalNumber ";
                 }
 
-                
 
-	            sql += @" LEFT JOIN Manifest m on m.id = s.manifestid
-                        )
-                        SELECT
-	                    AWB,
-	                    Nalog,
-                        Barcodes,
-	                    ExternalNumber,
-	                    Status,
-	                    EventDate,
-	                    Weight
+	            sql += @" 
+                        ) SELECT
+                            AWB, 
+                            Nalog, 
+                            LastMileCarrier,
+                            Barcodes, 
+                            ExternalNumber, 
+                            Status, 
+                            EventDate, 
+                            EventDateOnly,
+                            CreatedOn,
+                            CreatedOnDateOnly,
+                            Weight 
                         FROM RankedEvents
-                        WHERE RowNum = 1
-                        ORDER BY EventDate ";
+                        WHERE RowNum = 1 ";
 
                 var parameters = new { JsonList = jsonList };
                 var result = await connection.QueryAsync(sql, parameters, commandTimeout: 300);
@@ -124,24 +133,24 @@ namespace StatusReport.Services
             }
         }
 
-        //Get Temp
+        //GetLastReport
         public async Task<IEnumerable<dynamic>> GetLastReport(string jsonList, bool isSearchByBarcode)
         {
             using (var connection = _serverConnection.GetDbConnection())
             {
 
                 string sql = @"SELECT 
-                            m.AWB,
-                            m.Nalog,
-                            s.LastMileCarrier,
-                            s.Barcodes,
-                            s.ExternalNumber,
-                            c.Description as Status, 
-                            s.StatusTime as EventDate,
-                            CAST(s.StatusTime AS DATE) as EventDateOnly,
-                            s.CreatedOn as CreatedOn,
-                            CAST(s.CreatedOn AS DATE) as CreatedOnDateOnly,
-                            s.Weight 
+                                m.AWB,
+                                m.Nalog,
+                                s.LastMileCarrier,
+                                s.Barcodes,
+                                s.ExternalNumber,
+                                c.Description as Status, 
+                                s.StatusTime as EventDate,
+                                CAST(s.StatusTime AS DATE) as EventDateOnly,
+                                s.CreatedOn as CreatedOn,
+                                CAST(s.CreatedOn AS DATE) as CreatedOnDateOnly,
+                                s.Weight 
                             FROM Shipment s
                             INNER JOIN CodeLookUp c ON s.StatusCodeId = c.Id";
                            
@@ -154,10 +163,7 @@ namespace StatusReport.Services
                     sql += @" INNER JOIN (SELECT [value] FROM OPENJSON(@JsonList)) as jsons ON jsons.[value] = s.ExternalNumber ";
                 }
 
-
-
                 sql += @" LEFT JOIN Manifest m on m.id = s.manifestid";
-
 
                 var parameters = new { JsonList = jsonList };
                 var result = await connection.QueryAsync(sql, parameters, commandTimeout: 300);
