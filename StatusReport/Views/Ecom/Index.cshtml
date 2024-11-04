@@ -1,7 +1,7 @@
 ﻿@using StatusReport.ViewModels
 @model FileUploadViewModel
 <div class="container">
-    <h1 class="mb-3 mt-3">Report Generator</h1>
+    <h1 class="mb-3 mt-3">ECOM Statuses</h1>
     <form asp-action="UploadExcelFile" method="post" enctype="multipart/form-data" class="">
         <div class="bg-dark p-4" style="border-radius:20px;">
             <div class="row">
@@ -9,20 +9,22 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Generate by:</h5>
-                            <div class="row">
+                            <!--<div class="row">
                                 <label class="radio-inline card-text ">
-                                    <input type="radio" name="criteria" value="barcode" checked><span class="ms-3">Barcode</span>
+                                    <input type="radio" name="criteria" value="barcode"><span class="ms-3">Barcode</span>
                                 </label>
-                            </div>                          
-                            
+                            </div>-->
+
                             <div class="row">
                                 <label class="radio-inline card-text">
-                                    <input type="radio" name="criteria" value="external"><span class="ms-3">External No</span>
+                                    <input type="radio" name="criteria" value="external" checked><span class="ms-3">External No</span>
                                 </label>
                             </div>
                             <div class="row" style="height: 24px;">
                             </div>
                             <br />
+                            <div class="row" style="height: 24px;">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -34,11 +36,20 @@
                                 <label class="radio-inline card-text ">
                                     <input type="radio" name="status" value="last" checked><span class="ms-3">Last</span>
                                 </label>
-                            </div><br />
-                            <h5 class="card-title">Barkod kurira</h5>
+                            </div>
+                            <div class="row">
+                                <label class="radio-inline card-text ">
+                                    <input type="radio" name="status" value="temporary"><span class="ms-3">Last by EventDate</span>
+                                </label>
+                            </div>
                             <div class="row">
                                 <label class="radio-inline card-text">
-                                    <input type="radio" name="status" value="barcode"><span class="ms-3">Barcode</span>
+                                    <input type="radio" name="status" value="cleared"><span class="ms-3">Customs/PDV</span>
+                                </label>
+                            </div>
+                            <div class="row">
+                                <label class="radio-inline card-text">
+                                    <input type="radio" name="status" value="LMC"><span class="ms-3">LMC</span>
                                 </label>
                             </div>
                         </div>
@@ -46,7 +57,7 @@
                 </div>
 
             </div>
-            
+
             <hr />
             <!-- Drag and Drop Area -->
             <div class="mt-5">

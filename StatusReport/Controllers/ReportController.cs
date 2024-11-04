@@ -61,47 +61,11 @@ namespace StatusReport.Controllers
                 }
             }
 
-
-            if (criteria == "barcode" && status == "cleared")
-            {
-
-                var jsonList = JsonConvert.SerializeObject(barcodes);
-
-                var reportResults = await _reportServices.GetClearedReport(jsonList, true);
-
-                return await GenerateExcelFile(reportResults);
-            }
-            else if (criteria == "external" && status == "cleared")
-            {
-
-                var jsonList = JsonConvert.SerializeObject(barcodes);
-
-                var reportResults = await _reportServices.GetClearedReport(jsonList, false);
-
-                return await GenerateExcelFile(reportResults);
-
-            }
-            else if (criteria == "barcode" && status == "last")
+            if (criteria == "barcode" && status == "last")
             {
                 var jsonList = JsonConvert.SerializeObject(barcodes);
 
                 var reportResults = await _reportServices.GetLastReport(jsonList, true);
-
-                return await GenerateExcelFile(reportResults);
-            }
-            else if (criteria == "external" && status == "last")
-            {
-                var jsonList = JsonConvert.SerializeObject(barcodes);
-
-                var reportResults = await _reportServices.GetLastReport(jsonList, false);
-
-                return await GenerateExcelFile(reportResults);
-            }
-            else if (criteria == "barcode" && status == "temporary")
-            {
-                var jsonList = JsonConvert.SerializeObject(barcodes);
-
-                var reportResults = await _reportServices.GetTemporaryReport(jsonList, true);
 
                 return await GenerateExcelFile(reportResults);
             }
@@ -115,12 +79,10 @@ namespace StatusReport.Controllers
                 var reportResults = await _barcodeServices.GetCourierBarcode(barcodes, false);
                 return await GenerateCourierBarcodeExcel(reportResults);
             }
-            else 
+            else //(criteria == "external" && status == "last")
             {
                 var jsonList = JsonConvert.SerializeObject(barcodes);
-
-                var reportResults = await _reportServices.GetTemporaryReport(jsonList, false);
-
+                var reportResults = await _reportServices.GetLastReport(jsonList, false);
                 return await GenerateExcelFile(reportResults);
             }
         }
