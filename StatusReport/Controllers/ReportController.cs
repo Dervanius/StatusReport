@@ -61,6 +61,11 @@ namespace StatusReport.Controllers
                 }
             }
 
+            if(barcodes.Count > 20000 && criteria == "barcode")
+            {
+                return BadRequest("Ne mozete izvuci podatke za vise od 20.000 posiljaka po barkodu\nPokušajte po ExternalNumber-u ili se obratite razvoju!");
+            }
+
             if (criteria == "barcode" && status == "last")
             {
                 var jsonList = JsonConvert.SerializeObject(barcodes);
