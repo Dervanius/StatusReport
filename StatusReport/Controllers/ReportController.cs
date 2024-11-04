@@ -61,9 +61,9 @@ namespace StatusReport.Controllers
                 }
             }
 
-            if(barcodes.Count > 20000 && criteria == "barcode")
+            if(barcodes.Count > 5000 && criteria == "barcode")
             {
-                return BadRequest("Ne mozete izvuci podatke za vise od 20.000 posiljaka po barkodu\nPokušajte po ExternalNumber-u ili se obratite razvoju!");
+                return BadRequest("Ne mozete izvuci podatke za vise od 5.000 posiljaka po barkodu\nPokušajte po ExternalNumber-u ili se obratite razvoju!");
             }
 
             if (criteria == "barcode" && status == "last")
