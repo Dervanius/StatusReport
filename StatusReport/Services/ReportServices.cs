@@ -149,50 +149,20 @@ namespace StatusReport.Services
 
                 string sql = @"WITH RankedEvents AS (
                                 SELECT
-		                            s.ExternalNumber,
-		                            s.Id,
-		                            m.awb,
-		                            m.Nalog,
-                                    s.LastMileCarrier,
-                                    s.Barcodes,
+		                            se.ExternalNumber,
 		                            clu.Description as status,
 		                            se.EventDate,
                                     CAST(se.EventDate AS DATE) as EventDateOnly,
-                                    s.CreatedOn,
-                                    CAST(s.CreatedOn AS DATE) as CreatedOnDateOnly,
-                                    ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate desc) AS RowNum,
-		                            clu.DisplayOrder,
-		                            s.Weight,
-                                    s.GoodsValue 
+                                    ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate desc) AS RowNum
                                 FROM ShipmentEvent se
-	                            INNER JOIN Shipment s on s.id = se.ShipmentId
 	                            INNER JOIN CodeLookUp clu on clu.id = se.StatusCodeId
-                                INNER JOIN Manifest m on m.id = s.manifestid";
-
-                if (isSearchByBarcode)
-                {
-                    sql += @" INNER JOIN (SELECT [value] FROM OPENJSON(@JsonList)) as jsons ON jsons.[value] = s.Barcodes ";
-                }
-                else
-                {
-                    sql += @" INNER JOIN (SELECT [value] FROM OPENJSON(@JsonList)) as jsons ON jsons.[value] = s.ExternalNumber ";
-                }
-
-
+                                INNER JOIN (SELECT [value] FROM OPENJSON(@JsonList)) as jsons ON jsons.[value] = se.ExternalNumber ";
                 sql += @" 
                         ) SELECT
-                            AWB, 
-                            Nalog, 
-                            LastMileCarrier,
-                            Barcodes, 
                             ExternalNumber, 
                             Status, 
                             EventDate, 
-                            EventDateOnly,
-                            CreatedOn,
-                            CreatedOnDateOnly,
-                            Weight,
-                            GoodsValue 
+                            EventDateOnly
                         FROM RankedEvents
                         WHERE RowNum = 1 ";
 
