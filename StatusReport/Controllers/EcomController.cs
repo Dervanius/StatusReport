@@ -251,8 +251,6 @@ namespace StatusReport.Controllers
                 worksheet.Cells[1, 8].Value = "DatumPredatoKuriru";
                 worksheet.Cells[1, 9].Value = "DatumUDisCentr";
                 worksheet.Cells[1, 10].Value = "DatumUTranzitu";
-                worksheet.Cells[1, 11].Value = "StatusKurira";
-                worksheet.Cells[1, 12].Value = "DatumStatusKurir";
 
                 // Adding data rows
                 int row = 2;
@@ -274,19 +272,11 @@ namespace StatusReport.Controllers
                     worksheet.Cells[row, 8].Value = status.DatumPredatoKuriru;
                     worksheet.Cells[row, 8].Style.Numberformat.Format = "yyyy.mm.dd hh:mm:ss";
 
-
                     worksheet.Cells[row, 9].Value = status.DatumUDisCentr;
                     worksheet.Cells[row, 9].Style.Numberformat.Format = "yyyy.mm.dd hh:mm:ss";
 
-
                     worksheet.Cells[row, 10].Value = status.DatumUTranzitu;
                     worksheet.Cells[row, 10].Style.Numberformat.Format = "yyyy.mm.dd hh:mm:ss";
-
-                    worksheet.Cells[row, 11].Value = status.StatusKurira;
-
-                    worksheet.Cells[row, 12].Value = status.DatumStatusKurir;
-                    worksheet.Cells[row, 12].Style.Numberformat.Format = "yyyy.mm.dd hh:mm:ss";
-
 
                     row++;
                 }
@@ -315,13 +305,10 @@ namespace StatusReport.Controllers
                 worksheet.Cells[1, 3].Value = "Barcodes";
                 worksheet.Cells[1, 4].Value = "PoslednjiStatus";
                 worksheet.Cells[1, 5].Value = "DatumPoslednjegStatusa";
-                worksheet.Cells[1, 6].Value = "DatumPredatoKuriru";
-                worksheet.Cells[1, 7].Value = "DatumUDisCentr";
-                worksheet.Cells[1, 8].Value = "DatumUTranzitu";
-                worksheet.Cells[1, 9].Value = "StatusKurira";
-                worksheet.Cells[1, 10].Value = "DatumStatusKurir";
-                worksheet.Cells[1, 11].Value = "FinalniStatus";
-                worksheet.Cells[1, 12].Value = "DatumFinalni";
+                worksheet.Cells[1, 6].Value = "StatusKurira";
+                worksheet.Cells[1, 7].Value = "DatumStatusKurir";
+                worksheet.Cells[1, 8].Value = "FinalniStatus";
+                worksheet.Cells[1, 9].Value = "DatumFinalni";
 
                 // Adding data rows
                 int row = 2;
@@ -334,22 +321,13 @@ namespace StatusReport.Controllers
                     worksheet.Cells[row, 5].Value = status.DatumPoslednjegStatusa;
                     worksheet.Cells[row, 5].Style.Numberformat.Format = "yyyy.mm.dd hh:mm:ss";
 
-                    worksheet.Cells[row, 6].Value = status.DatumPredatoKuriru;
-                    worksheet.Cells[row, 6].Style.Numberformat.Format = "yyyy.mm.dd hh:mm:ss";
-
-                    worksheet.Cells[row, 7].Value = status.DatumUDisCentr;
+                    worksheet.Cells[row, 6].Value = status.StatusKurira;
+                    worksheet.Cells[row, 7].Value = status.DatumStatusKurir;
                     worksheet.Cells[row, 7].Style.Numberformat.Format = "yyyy.mm.dd hh:mm:ss";
 
-                    worksheet.Cells[row, 8].Value = status.DatumUTranzitu;
-                    worksheet.Cells[row, 8].Style.Numberformat.Format = "yyyy.mm.dd hh:mm:ss";
-
-                    worksheet.Cells[row, 9].Value = status.StatusKurira;
-                    worksheet.Cells[row, 10].Value = status.DatumStatusKurir;
-                    worksheet.Cells[row, 10].Style.Numberformat.Format = "yyyy.mm.dd hh:mm:ss";
-
-                    worksheet.Cells[row, 11].Value = status.FinalniStatus;
-                    worksheet.Cells[row, 12].Value = status.DatumFinalni;
-                    worksheet.Cells[row, 12].Style.Numberformat.Format = "yyyy.mm.dd hh:mm:ss";
+                    worksheet.Cells[row, 8].Value = status.FinalniStatus;
+                    worksheet.Cells[row, 9].Value = status.DatumFinalni;
+                    worksheet.Cells[row, 9].Style.Numberformat.Format = "yyyy.mm.dd hh:mm:ss";
 
                     row++;
                 }
