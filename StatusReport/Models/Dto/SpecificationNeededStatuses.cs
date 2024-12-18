@@ -12,9 +12,13 @@
         public DateTime? DatumOcarinjeno { get; set; }
         public DateTime? DatumPredatoKuriru { get; set; }
         public DateTime? DatumUDisCentr { get; set; }
+        public DateTime? DatumUTranzitu { get; set; }
 
         public string StatusKurira { get; set; }
         public DateTime? DatumStatusKurir { get; set; }
+
+        public string? FinalniStatus { get; set; }
+        public DateTime? DatumFinalni { get; set; }
 
         public DateTime? DatumIsporucen { get; set; }
 

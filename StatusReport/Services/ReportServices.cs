@@ -46,7 +46,7 @@ namespace StatusReport.Services
 
                             NaCar AS ( SELECT * FROM (
                                 SELECT
-		                            s.id
+                                    s.id
                                     ,se.EventDate
                                     ,ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate) AS RowNum
                                 FROM
@@ -59,7 +59,7 @@ namespace StatusReport.Services
 
                             Ocarinjeno AS ( SELECT * FROM (
                                 SELECT
-		                            s.id
+                                    s.id
                                     ,se.EventDate
                                     ,ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate) AS RowNum
                                 FROM
@@ -96,17 +96,30 @@ namespace StatusReport.Services
                             WHERE RowNum = 1
                             ),
 
-                            StatusKurir AS ( SELECT * FROM (
+	                        UTranzitu AS ( SELECT * FROM (
                                 SELECT
                                     s.id
                                     ,se.EventDate
-		                            ,clu.description as status
                                     ,ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate) AS RowNum
                                 FROM
                                     ShipmentEvent se
                                 INNER JOIN Ship s ON  s.id = se.ShipmentId 
-	                            join CodeLookUp clu on se.StatusCodeId = clu.id
-                                WHERE se.StatusCodeId in (1261,1255,1258,16)--Statusi kurira
+                                WHERE se.StatusCodeId = 16					--U tranzitu
+                            )a
+                            WHERE RowNum = 1
+                            ),
+
+                            StatusKurir AS ( SELECT * FROM (
+                                SELECT
+                                    s.id
+                                    ,se.EventDate
+                                    ,clu.description as status
+                                    ,ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate) AS RowNum
+                                FROM
+                                    ShipmentEvent se
+                                INNER JOIN Ship s ON  s.id = se.ShipmentId 
+                                join CodeLookUp clu on se.StatusCodeId = clu.id
+                                WHERE se.StatusCodeId in (1261,1255,1258,1271) --Statusi kurira
                             )a
                             WHERE RowNum = 1
                             )
@@ -122,6 +135,7 @@ namespace StatusReport.Services
                             o.EventDate AS DatumOcarinjeno,
                             pk.EventDate AS DatumPredatoKuriru,
                             dc.EventDate AS DatumUDisCentr,
+                            utc.EventDate AS DatumUTranzitu,
 
                             sk.status as StatusKurira,
                             sk.EventDate AS DatumStatusKurir
@@ -131,6 +145,7 @@ namespace StatusReport.Services
                             left join Ocarinjeno o on s.id = o.id
                             left join PredatoKuriru pk on s.id = pk.id
                             left join UDisCentr dc on s.id = dc.id
+                            left join UTranzitu utc on s.id = utc.id
                             left join StatusKurir sk on s.id = sk.id
                         ";
 
@@ -240,32 +255,6 @@ namespace StatusReport.Services
                         INNER JOIN CodeLookUp clu on clu.id = s.StatusCodeId
                             ),
 
-                            NaCar AS ( SELECT * FROM (
-                                SELECT
-		                            s.id
-                                    ,se.EventDate
-                                    ,ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate) AS RowNum
-                                FROM
-                                    ShipmentEvent se
-                                INNER JOIN Ship s ON  s.id = se.ShipmentId 
-                                WHERE se.StatusCodeId = 1243                --Ocarninjeno
-                            )a
-                            WHERE RowNum = 1
-                            ),
-
-                            Ocarinjeno AS ( SELECT * FROM (
-                                SELECT
-		                            s.id
-                                    ,se.EventDate
-                                    ,ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate) AS RowNum
-                                FROM
-                                    ShipmentEvent se
-                                INNER JOIN Ship s ON  s.id = se.ShipmentId 
-                                WHERE se.StatusCodeId = 1244                --Ocarninjeno
-                            )a
-                            WHERE RowNum = 1
-                            ),
-
                             PredatoKuriru AS ( SELECT * FROM (
                                 SELECT
                                     s.id
@@ -292,17 +281,45 @@ namespace StatusReport.Services
                             WHERE RowNum = 1
                             ),
 
-                            StatusKurir AS ( SELECT * FROM (
+	                        UTranzitu AS ( SELECT * FROM (
                                 SELECT
                                     s.id
                                     ,se.EventDate
-		                            ,clu.description as status
                                     ,ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate) AS RowNum
                                 FROM
                                     ShipmentEvent se
                                 INNER JOIN Ship s ON  s.id = se.ShipmentId 
-	                            join CodeLookUp clu on se.StatusCodeId = clu.id
-                                WHERE se.StatusCodeId in (1261,1255,1258,16)--Statusi kurira
+                                WHERE se.StatusCodeId = 16					--U tranzitu
+                            )a
+                            WHERE RowNum = 1
+                            ),
+
+                            StatusKurir AS ( SELECT * FROM (
+                                SELECT
+                                    s.id
+                                    ,se.EventDate
+                                    ,clu.description as status
+                                    ,ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate) AS RowNum
+                                FROM
+                                    ShipmentEvent se
+                                INNER JOIN Ship s ON  s.id = se.ShipmentId 
+                                join CodeLookUp clu on se.StatusCodeId = clu.id
+                                WHERE se.StatusCodeId in (1261,1255,1258,1271) --Statusi kurira
+                            )a
+                            WHERE RowNum = 1
+                            ),
+
+                            Finalni AS ( SELECT * FROM (
+                                SELECT
+                                    s.id
+                                    ,se.EventDate
+                                    ,clu.description as status
+                                    ,ROW_NUMBER() OVER (PARTITION BY ShipmentId ORDER BY EventDate) AS RowNum
+                                FROM
+                                    ShipmentEvent se
+                                INNER JOIN Ship s ON  s.id = se.ShipmentId 
+                                join CodeLookUp clu on se.StatusCodeId = clu.id 
+                                WHERE se.StatusCodeId in (18,1245,1270,1259)					--finalni
                             )a
                             WHERE RowNum = 1
                             )
@@ -314,20 +331,22 @@ namespace StatusReport.Services
                             s.Status AS PoslednjiStatus,
                             s.StatusTime AS DatumPoslednjegStatusa,
 
-                            nc.EventDate AS DatumNaCarinjenju,
-                            o.EventDate AS DatumOcarinjeno,
                             pk.EventDate AS DatumPredatoKuriru,
                             dc.EventDate AS DatumUDisCentr,
+                            utc.EventDate AS DatumUTranzitu,
 
                             sk.status as StatusKurira,
-                            sk.EventDate AS DatumStatusKurir
+                            sk.EventDate AS DatumStatusKurir,
+
+                            fn.status as FinalniStatus,
+                            fn.EventDate AS DatumFinalni
 
                             from Ship s
-                            left join NaCar nc on s.id = nc.id
-                            left join Ocarinjeno o on s.id = o.id
                             left join PredatoKuriru pk on s.id = pk.id
                             left join UDisCentr dc on s.id = dc.id
+                            left join UTranzitu utc on s.id = utc.id
                             left join StatusKurir sk on s.id = sk.id
+                            left join Finalni fn on s.id = fn.id
                         ";
 
                 var parameters = new { JsonList = jsonList };
